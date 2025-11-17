@@ -1,0 +1,8 @@
+xaza 5
+int y 3
+if x 10
+if y x
+y y x
+else
+y x
+stdcout y
