@@ -163,6 +163,14 @@ Token Lexer::nextToken() {
                     return Token::OP_MINUS;
                 break;
 
+            case State::DIV_Q1:
+                if (currChar == '/') {
+                    currChar = in.get();
+                    state = State::COMMENT_Q1;
+                }
+                else
+                    return Token::OP_DIV;
+
             case State::ARITHM_Q1:
                 return tokenize_arithmetic(lexeme);
 
@@ -246,6 +254,16 @@ Token Lexer::nextToken() {
 
             case State::DELIM_Q1:
                 return tokenize_delimiter(lexeme);
+
+            case State::COMMENT_Q1:
+                if (currChar != '\n') {
+                    currChar = in.get();
+                    state = State::COMMENT_Q1;
+                }
+                else {
+                    state = State::Q0;
+                }
+                break;
 
             case State::SPACES_Q1:
                 if (currChar == ' ' || currChar == '\t') {
