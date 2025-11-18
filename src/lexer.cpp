@@ -170,6 +170,7 @@ Token Lexer::nextToken() {
                 }
                 else
                     return Token::OP_DIV;
+                break;
 
             case State::ARITHM_Q1:
                 return tokenize_arithmetic(lexeme);

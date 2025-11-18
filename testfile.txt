@@ -1,8 +1,6 @@
-xaza 5 {
-    int y -55
-    if -x5 10 }
--if (y,x)
-y_y_x
-else
-_y x
-stdcout y
+int x = 5;
+{
+int y = 10; // y es visible globalmente
+x <= x + y;
+}
+print(y); // Valido y todavia es accesible
