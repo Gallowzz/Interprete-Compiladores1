@@ -1,7 +1,7 @@
 xaza 5 {
-    int y 3
-    if x5 10 }
-if (y,x)
+    int y -55
+    if -x5 10 }
+-if (y,x)
 y_y_x
 else
 _y x

@@ -12,8 +12,8 @@ enum class Token {
     KW_WHILE,
     KW_PRINT,
     // Operadores Aritmeticos
-    OP_SUM,
-    OP_RESTA,
+    OP_PLUS,
+    OP_MINUS,
     OP_MULT,
     OP_DIV,
     OP_MOD,

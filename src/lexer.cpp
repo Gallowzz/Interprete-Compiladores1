@@ -4,7 +4,8 @@
 enum class State {
     Q0,             // Estado Inicial
     EOF_Q1,         // Final de Archivo
-    OP_Q1,          // Operador
+    OP_Q1,          // Operadores un Caracter
+    MINUS_Q1,       // Resta o Numero Negativo
     DELIM_Q1,       // Delimitadores
     NUM_Q1,         // Enteros 64-bits
     ID_Q1,          // Identificadores y Palabras Claves (minusculas)
@@ -36,9 +37,10 @@ Token Lexer::nextToken() {
                     currChar = in.get();
                     state = State::ID_Q2;
                 }
-                else if (currChar == ' ' || currChar == '\t' || currChar == '\n') {
+                else if (currChar == '-'){
+                    lexeme += static_cast<char>(currChar);
                     currChar = in.get();
-                    state = State::SPACES_Q1;
+                    state = State::MINUS_Q1;
                 }
                 else if (is_operator(currChar)) {
                     lexeme += static_cast<char>(currChar);
@@ -49,6 +51,10 @@ Token Lexer::nextToken() {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::DELIM_Q1;
+                }
+                else if (currChar == ' ' || currChar == '\t' || currChar == '\n') {
+                    currChar = in.get();
+                    state = State::SPACES_Q1;
                 }
                 else {
                     throw std::runtime_error("Invalid Character");
@@ -99,6 +105,17 @@ Token Lexer::nextToken() {
                     return Token::IDENTIFIER;
                 }
                 break;
+
+            case State::MINUS_Q1:
+                if (is_Digit(currChar)) {
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::NUM_Q1;
+                }
+                else
+                    return Token::OP_MINUS;
+                break;
+
 
             case State::DELIM_Q1:
                 return tokenize_delimiter(lexeme);
