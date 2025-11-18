@@ -36,7 +36,9 @@ enum class Token {
     LPAREN,
     RPAREN,
     LBRACKET,
-    RBRACKET
+    RBRACKET,
+    // Not a Token
+    N_A_T
 };
 
 class Lexer {
@@ -56,7 +58,7 @@ public:
     // Para identificar tokens pertenecientes a grupos amplios
     // e.g. Keywords, Operadores, o Delimitadores
     Token tokenize_keyword(std::string& lexeme);
-    Token tokenize_operator(std::string& lexeme);
+    Token tokenize_arithmetic(std::string& lexeme);
     Token tokenize_delimiter(std::string& lexeme);
 
     // Para revisar a que grupo pertenece un caracter. Mejora la lectura.
@@ -64,5 +66,6 @@ public:
     bool is_upper(char);
     bool is_lower(char);
     bool is_operator(char);
+    bool is_arithmetic(char);
     bool is_delim(char);
 };

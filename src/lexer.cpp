@@ -4,8 +4,10 @@
 enum class State {
     Q0,             // Estado Inicial
     EOF_Q1,         // Final de Archivo
-    OP_Q1,          // Operadores un Caracter
     MINUS_Q1,       // Resta o Numero Negativo
+    ARITHM_Q1,      // Otros Operadores Aritmeticos
+    EQ_Q1,          // Igualdad
+
     DELIM_Q1,       // Delimitadores
     NUM_Q1,         // Enteros 64-bits
     ID_Q1,          // Identificadores y Palabras Claves (minusculas)
@@ -42,10 +44,10 @@ Token Lexer::nextToken() {
                     currChar = in.get();
                     state = State::MINUS_Q1;
                 }
-                else if (is_operator(currChar)) {
+                else if (is_arithmetic(currChar)){
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
-                    state = State::OP_Q1;
+                    state = State::ARITHM_Q1;
                 }
                 else if (is_delim(currChar)) {
                     lexeme += static_cast<char>(currChar);
@@ -116,6 +118,8 @@ Token Lexer::nextToken() {
                     return Token::OP_MINUS;
                 break;
 
+            case State::ARITHM_Q1:
+                return tokenize_arithmetic(lexeme);
 
             case State::DELIM_Q1:
                 return tokenize_delimiter(lexeme);
@@ -154,6 +158,19 @@ Token Lexer::tokenize_keyword(std::string &lexeme) {
         return Token::IDENTIFIER;
 }
 
+Token Lexer::tokenize_arithmetic(std::string& lexeme){
+    if (lexeme == "+")
+        return Token::OP_PLUS;
+    else if (lexeme == "*")
+        return Token::OP_MULT;
+    else if (lexeme == "/")
+        return Token::OP_DIV;
+    else if (lexeme == "%")
+        return Token::OP_MOD;
+    else
+        return Token::N_A_T;
+}
+
 Token Lexer::tokenize_delimiter(std::string &lexeme){
     if (lexeme == ";")
         return Token::SEMICOLON;
@@ -168,7 +185,7 @@ Token Lexer::tokenize_delimiter(std::string &lexeme){
     else if (lexeme == "}")
         return Token::RBRACKET;
     else
-        return Token::END_OF_FILE;
+        return Token::N_A_T;
 }
 
 // -----------------
@@ -197,6 +214,12 @@ bool Lexer::is_operator(char) {
     if (currChar == '+' || currChar == '-' || currChar == '*' || currChar == '/' || currChar == '%'
         || currChar == '=' || currChar == '!' || currChar == '<' || currChar == '>'
         || currChar == '&' || currChar == '|')
+        return true;
+    return false;
+}
+
+bool Lexer::is_arithmetic(char) {
+    if (currChar == '+' || currChar == '*' || currChar == '/' || currChar == '%')
         return true;
     return false;
 }
