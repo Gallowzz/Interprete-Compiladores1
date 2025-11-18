@@ -3,9 +3,9 @@
 
 enum class State {
     Q0,             // Estado Inicial
-    EOF_Q1,         // Final de Archivo
     // Operadores
     MINUS_Q1,       // Resta o Numero Negativo
+    DIV_Q1,         // Divisor (o pasa a comentario)
     ARITHM_Q1,      // Otros Operadores Aritmeticos
     ASSIGN_Q1,      // Asignacion
     EQ_Q1,          // Comparacion Igualdad
@@ -16,11 +16,18 @@ enum class State {
     LEQ_Q1,         // Menor o Igual
     GREAT_Q1,       // Mayor
     GEQ_Q1,         // Mayor o Igual
+    AND_Q1,
+    AND_Q2,
+    OR_Q1,
+    OR_Q2,
     // Tipos de Datos
     NUM_Q1,         // Enteros 64-bits
     ID_Q1,          // Identificadores y Palabras Claves (minusculas)
     ID_Q2,          // Solo Identificadores
-    SPACES_Q1       // Espacios
+    // Otros
+    SPACES_Q1,      // Espacios
+    COMMENT_Q1,     // Comentarios
+    EOF_Q1,         // Final de Archivo
 };
 
 Token Lexer::nextToken() {
@@ -52,6 +59,11 @@ Token Lexer::nextToken() {
                     currChar = in.get();
                     state = State::MINUS_Q1;
                 }
+                else if (currChar == '/') {
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::DIV_Q1;
+                }
                 else if (is_arithmetic(currChar)){
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
@@ -71,6 +83,16 @@ Token Lexer::nextToken() {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::GREAT_Q1;
+                }
+                else if (currChar == '&'){
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::AND_Q1;
+                }
+                else if (currChar == '|'){
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::OR_Q1;
                 }
                 else if (is_delim(currChar)) {
                     lexeme += static_cast<char>(currChar);
@@ -196,6 +218,32 @@ Token Lexer::nextToken() {
             case State::GEQ_Q1:
                 return Token::OP_GEQ;
 
+            case State::AND_Q1:
+                if (currChar == '&') {
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::AND_Q2;
+                }
+                else
+                    return Token::N_A_T;
+                break;
+
+            case State::AND_Q2:
+                return Token::OP_AND;
+
+            case State::OR_Q1:
+                if (currChar == '|') {
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::OR_Q2;
+                }
+                else
+                    return Token::N_A_T;
+                break;
+
+            case State::OR_Q2:
+                return Token::OP_OR;
+
             case State::DELIM_Q1:
                 return tokenize_delimiter(lexeme);
 
@@ -239,8 +287,6 @@ Token Lexer::tokenize_arithmetic(std::string& lexeme){
         return Token::OP_PLUS;
     else if (lexeme == "*")
         return Token::OP_MULT;
-    else if (lexeme == "/")
-        return Token::OP_DIV;
     else if (lexeme == "%")
         return Token::OP_MOD;
     else
@@ -286,16 +332,8 @@ bool Lexer::is_lower(char){
     return false;
 }
 
-bool Lexer::is_operator(char) {
-    if (currChar == '+' || currChar == '-' || currChar == '*' || currChar == '/' || currChar == '%'
-        || currChar == '=' || currChar == '!' || currChar == '<' || currChar == '>'
-        || currChar == '&' || currChar == '|')
-        return true;
-    return false;
-}
-
 bool Lexer::is_arithmetic(char) {
-    if (currChar == '+' || currChar == '*' || currChar == '/' || currChar == '%')
+    if (currChar == '+' || currChar == '*' || currChar == '%')
         return true;
     return false;
 }

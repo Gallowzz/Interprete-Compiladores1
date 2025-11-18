@@ -65,7 +65,6 @@ public:
     bool is_Digit(char);
     bool is_upper(char);
     bool is_lower(char);
-    bool is_operator(char);
     bool is_arithmetic(char);
     bool is_delim(char);
 };
