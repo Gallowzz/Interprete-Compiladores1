@@ -6,8 +6,8 @@ enum class State {
     EOF_Q1,         // Final de Archivo
     MINUS_Q1,       // Resta o Numero Negativo
     ARITHM_Q1,      // Otros Operadores Aritmeticos
-    EQ_Q1,          // Igualdad
-
+    ASSIGN_Q1,      // Asignacion
+    EQ_Q1,          // Comparacion Igualdad
     DELIM_Q1,       // Delimitadores
     NUM_Q1,         // Enteros 64-bits
     ID_Q1,          // Identificadores y Palabras Claves (minusculas)
@@ -48,6 +48,11 @@ Token Lexer::nextToken() {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::ARITHM_Q1;
+                }
+                else if (currChar == '='){
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::ASSIGN_Q1;
                 }
                 else if (is_delim(currChar)) {
                     lexeme += static_cast<char>(currChar);
@@ -120,6 +125,18 @@ Token Lexer::nextToken() {
 
             case State::ARITHM_Q1:
                 return tokenize_arithmetic(lexeme);
+
+            case State::ASSIGN_Q1:
+                if (currChar == '=') {
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::EQ_Q1;
+                }
+                else
+                    return Token::OP_ASSIGN;
+
+            case State::EQ_Q1:
+                return Token::OP_EQ;
 
             case State::DELIM_Q1:
                 return tokenize_delimiter(lexeme);
