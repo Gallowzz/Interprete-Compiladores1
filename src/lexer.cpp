@@ -12,14 +12,6 @@ enum class State {
     SPACES_Q1       // Espacios
 };
 
-std::string keywords[] = {
-    "int",
-    "if",
-    "else",
-    "while",
-    "print"
-};
-
 Token Lexer::nextToken() {
     State state = State::Q0;
 
@@ -79,10 +71,7 @@ Token Lexer::nextToken() {
                     state = State::ID_Q2;
                 }
                 else {
-                    if (is_Keyword(lexeme))
-                        return Token::KEYWORD;
-                    else
-                        return Token::IDENTIFIER;
+                    return tokenize_keyword(lexeme);
                 }
                 break;
 
@@ -117,15 +106,27 @@ Token Lexer::nextToken() {
 }
 
 // -----------------
+// Token Assigner
+// -----------------
+
+Token Lexer::tokenize_keyword(std::string &lexeme) {
+    if (lexeme == "int")
+        return Token::KW_INT;
+    else if (lexeme == "if")
+        return Token::KW_IF;
+    else if (lexeme == "else")
+        return Token::KW_ELSE;
+    else if (lexeme == "while")
+        return Token::KW_WHILE;
+    else if (lexeme == "print")
+        return Token::KW_PRINT;
+    else
+        return Token::IDENTIFIER;
+}
+
+// -----------------
 // Character Checker
 // -----------------
-bool Lexer::is_Keyword(std::string &lexeme) {
-    for (int i=0 ; i < keywords->length() ; i++) {
-        if (lexeme == keywords[i])
-            return true;
-    }
-    return false;
-}
 
 bool Lexer::is_Digit(char){
     if (currChar >= '0' && currChar <= '9')
@@ -151,7 +152,11 @@ const char *Lexer::tokenToString(Token &token){
         case Token::END_OF_FILE: return "END_OF_FILE";
         case Token::NUMBER: return "NUMBER";
         case Token::IDENTIFIER: return "IDENTIFIER";
-        case Token::KEYWORD: return "KEYWORD";
+        case Token::KW_INT: return "KW_INT";
+        case Token::KW_IF: return "KW_IF";
+        case Token::KW_ELSE: return "KW_ELSE";
+        case Token::KW_WHILE: return "KW_WHILE";
+        case Token::KW_PRINT: return "KW_PRINT";
         default: return "Unknown";
     }
 }
