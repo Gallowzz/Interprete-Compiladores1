@@ -5,7 +5,7 @@ enum class State {
     Q0,             // Estado Inicial
     EOF_Q1,         // Final de Archivo
     OP_Q1,          // Operador
-    DELIM_Q1,        // Delimitadores
+    DELIM_Q1,       // Delimitadores
     NUM_Q1,         // Enteros 64-bits
     ID_Q1,          // Identificadores y Palabras Claves (minusculas)
     ID_Q2,          // Solo Identificadores
@@ -39,6 +39,14 @@ Token Lexer::nextToken() {
                 else if (currChar == ' ' || currChar == '\t' || currChar == '\n') {
                     currChar = in.get();
                     state = State::SPACES_Q1;
+                }
+                else if (is_operator(currChar)) {
+                    currChar = in.get();
+                    state = State::OP_Q1;
+                }
+                else if (is_delim(currChar)) {
+                    currChar = in.get();
+                    state = State::DELIM_Q1;
                 }
                 else {
                     throw std::runtime_error("Invalid Character");
@@ -90,6 +98,9 @@ Token Lexer::nextToken() {
                 }
                 break;
 
+            case State::DELIM_Q1:
+
+
             case State::SPACES_Q1:
                 if (currChar == ' ' || currChar == '\t') {
                     currChar = in.get();
@@ -124,6 +135,21 @@ Token Lexer::tokenize_keyword(std::string &lexeme) {
         return Token::IDENTIFIER;
 }
 
+Token Lexer::tokenize_delimiter(std::string &lexeme){
+    if (lexeme == ";")
+        return Token::SEMICOLON;
+    else if (lexeme == ",")
+        return Token::COMA;
+    else if (lexeme == "(")
+        return Token::LPAREN;
+    else if (lexeme == ")")
+        return Token::RPAREN;
+    else if (lexeme == "{")
+        return Token::LBRACKET;
+    else if (lexeme == "}")
+        return Token::RBRACKET;
+}
+
 // -----------------
 // Character Checker
 // -----------------
@@ -142,6 +168,21 @@ bool Lexer::is_upper(char){
 
 bool Lexer::is_lower(char){
     if (currChar >= 'a' && currChar <= 'z')
+        return true;
+    return false;
+}
+
+bool Lexer::is_operator(char) {
+    if (currChar == '+' || currChar == '-' || currChar == '*' || currChar == '/' || currChar == '%'
+        || currChar == '=' || currChar == '!' || currChar == '<' || currChar == '>'
+        || currChar == '&' || currChar == '|')
+        return true;
+    return false;
+}
+
+bool Lexer::is_delim(char) {
+    if (currChar == ';' || currChar == ',' || currChar == '('
+        || currChar == ')' || currChar == '{' || currChar == '}')
         return true;
     return false;
 }
