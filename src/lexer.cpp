@@ -41,10 +41,12 @@ Token Lexer::nextToken() {
                     state = State::SPACES_Q1;
                 }
                 else if (is_operator(currChar)) {
+                    lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::OP_Q1;
                 }
                 else if (is_delim(currChar)) {
+                    lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::DELIM_Q1;
                 }
@@ -99,7 +101,7 @@ Token Lexer::nextToken() {
                 break;
 
             case State::DELIM_Q1:
-
+                return tokenize_delimiter(lexeme);
 
             case State::SPACES_Q1:
                 if (currChar == ' ' || currChar == '\t') {
@@ -148,6 +150,8 @@ Token Lexer::tokenize_delimiter(std::string &lexeme){
         return Token::LBRACKET;
     else if (lexeme == "}")
         return Token::RBRACKET;
+    else
+        return Token::END_OF_FILE;
 }
 
 // -----------------
