@@ -4,6 +4,7 @@
 enum class State {
     Q0,             // Estado Inicial
     EOF_Q1,         // Final de Archivo
+    // Operadores
     MINUS_Q1,       // Resta o Numero Negativo
     ARITHM_Q1,      // Otros Operadores Aritmeticos
     ASSIGN_Q1,      // Asignacion
@@ -11,6 +12,11 @@ enum class State {
     DELIM_Q1,       // Delimitadores
     NOT_Q1,         // Operador !
     NEQ_Q1,         // Desigualdad
+    LESS_Q1,        // Menor
+    LEQ_Q1,         // Menor o Igual
+    GREAT_Q1,       // Mayor
+    GEQ_Q1,         // Mayor o Igual
+    // Tipos de Datos
     NUM_Q1,         // Enteros 64-bits
     ID_Q1,          // Identificadores y Palabras Claves (minusculas)
     ID_Q2,          // Solo Identificadores
@@ -55,6 +61,16 @@ Token Lexer::nextToken() {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::ASSIGN_Q1;
+                }
+                else if (currChar == '<'){
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::LESS_Q1;
+                }
+                else if (currChar == '>'){
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::GREAT_Q1;
                 }
                 else if (is_delim(currChar)) {
                     lexeme += static_cast<char>(currChar);
@@ -153,6 +169,32 @@ Token Lexer::nextToken() {
 
             case State::NEQ_Q1:
                 return Token::OP_NEQ;
+
+            case State::LESS_Q1:
+                if (currChar == '=') {
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::LEQ_Q1;
+                }
+                else
+                    return Token::OP_LESS;
+                break;
+
+            case State::LEQ_Q1:
+                return Token::OP_LEQ;
+
+            case State::GREAT_Q1:
+                if (currChar == '=') {
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::GEQ_Q1;
+                }
+                else
+                    return Token::OP_LESS;
+                break;
+
+            case State::GEQ_Q1:
+                return Token::OP_GEQ;
 
             case State::DELIM_Q1:
                 return tokenize_delimiter(lexeme);
