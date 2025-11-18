@@ -9,6 +9,8 @@ enum class State {
     ASSIGN_Q1,      // Asignacion
     EQ_Q1,          // Comparacion Igualdad
     DELIM_Q1,       // Delimitadores
+    NOT_Q1,         // Operador !
+    NEQ_Q1,         // Desigualdad
     NUM_Q1,         // Enteros 64-bits
     ID_Q1,          // Identificadores y Palabras Claves (minusculas)
     ID_Q2,          // Solo Identificadores
@@ -134,9 +136,23 @@ Token Lexer::nextToken() {
                 }
                 else
                     return Token::OP_ASSIGN;
+                break;
 
             case State::EQ_Q1:
                 return Token::OP_EQ;
+
+            case State::NOT_Q1:
+                if (currChar == '=') {
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::EQ_Q1;
+                }
+                else
+                    return Token::OP_NOT;
+                break;
+
+            case State::NEQ_Q1:
+                return Token::OP_NEQ;
 
             case State::DELIM_Q1:
                 return tokenize_delimiter(lexeme);
@@ -149,6 +165,7 @@ Token Lexer::nextToken() {
                 else {
                     state = State::Q0;
                 }
+                break;
 
             default:
                 break;
