@@ -4,6 +4,8 @@
 enum class State {
     Q0,             // Estado Inicial
     EOF_Q1,         // Final de Archivo
+    OP_Q1,          // Operador
+    DELIM_Q1,        // Delimitadores
     NUM_Q1,         // Enteros 64-bits
     ID_Q1,          // Identificadores y Palabras Claves (minusculas)
     ID_Q2,          // Solo Identificadores
@@ -27,17 +29,17 @@ Token Lexer::nextToken() {
                 lexeme.clear();
                 if (currChar == EOF)
                     state = State::EOF_Q1;
-                else if (currChar >= '0' && currChar <= '9') {
+                else if (is_Digit(currChar)) {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::NUM_Q1;
                 }
-                else if (currChar >= 'a' && currChar <= 'z') {
+                else if (is_lower(currChar)) {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::ID_Q1;
                 }
-                else if (currChar >= 'A' && currChar <= 'Z' || currChar == '_') {
+                else if (is_upper(currChar) || currChar == '_') {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::ID_Q2;
@@ -55,7 +57,7 @@ Token Lexer::nextToken() {
                 return Token::END_OF_FILE;
 
             case State::NUM_Q1:
-                if (currChar >= '0' && currChar <= '9') {
+                if (is_Digit(currChar)) {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::NUM_Q1;
@@ -66,12 +68,12 @@ Token Lexer::nextToken() {
                 break;
 
             case State::ID_Q1:
-                if (currChar >= 'a' && currChar <= 'z') {
+                if (is_lower(currChar)) {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::ID_Q1;
                 }
-                else if (currChar >= 'A' && currChar <= 'Z' || currChar >= '0' && currChar <= '9' || currChar == '_') {
+                else if (is_upper(currChar) || is_Digit(currChar) || currChar == '_') {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::ID_Q2;
@@ -85,9 +87,9 @@ Token Lexer::nextToken() {
                 break;
 
             case State::ID_Q2:
-                if (currChar >= '0' && currChar <= '9'
-                    || currChar >= 'a' && currChar <= 'z'
-                    || currChar >= 'A' && currChar <= 'Z'
+                if (is_Digit(currChar)
+                    || is_lower(currChar)
+                    || is_upper(currChar)
                     || currChar == '_')
                 {
                     lexeme += static_cast<char>(currChar);
@@ -114,6 +116,9 @@ Token Lexer::nextToken() {
     }
 }
 
+// -----------------
+// Character Checker
+// -----------------
 bool Lexer::is_Keyword(std::string &lexeme) {
     for (int i=0 ; i < keywords->length() ; i++) {
         if (lexeme == keywords[i])
@@ -122,6 +127,25 @@ bool Lexer::is_Keyword(std::string &lexeme) {
     return false;
 }
 
+bool Lexer::is_Digit(char){
+    if (currChar >= '0' && currChar <= '9')
+        return true;
+    return false;
+}
+
+bool Lexer::is_upper(char){
+    if (currChar >= 'A' && currChar <= 'Z')
+        return true;
+    return false;
+}
+
+bool Lexer::is_lower(char){
+    if (currChar >= 'a' && currChar <= 'z')
+        return true;
+    return false;
+}
+
+// Token Clasifier for output
 const char *Lexer::tokenToString(Token &token){
     switch (token) {
         case Token::END_OF_FILE: return "END_OF_FILE";

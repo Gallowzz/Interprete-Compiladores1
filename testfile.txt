@@ -1,6 +1,6 @@
 xaza 5
 int y 3
-if x 10
+if x5 10
 if y x
 y y x
 else

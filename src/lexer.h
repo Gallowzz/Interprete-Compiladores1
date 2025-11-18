@@ -19,7 +19,13 @@ public:
     }
 
     Token nextToken();
-    bool is_Keyword(std::string& lexeme);
     std::string getLexeme() const { return lexeme; }
     static const char *Lexer::tokenToString(Token &token);
+
+    // Para revisar a que grupo pertenece un caracter. Mejora la lectura.
+    bool is_Keyword(std::string& lexeme);
+    bool is_Digit(char);
+    bool is_upper(char);
+    bool is_lower(char);
+    bool is_symbol(char);
 };
