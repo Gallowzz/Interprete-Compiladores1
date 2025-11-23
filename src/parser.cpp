@@ -48,10 +48,97 @@ void Parser::varDecl(){
             currToken = lexer.nextToken();
         }
         else {
-            throw std::runtime_error("Expected assignment or ;");
+            throw std::runtime_error("Expected assignment or ';'");
         }
     }
     else {
         throw std::runtime_error("Expected Identifier");
     }
+}
+
+void Parser::assignment(){
+    if (currToken == Token::OP_ASSIGN){
+        currToken = lexer.nextToken();
+        expression();
+        if (currToken == Token::SEMICOLON) {
+            currToken = lexer.nextToken();
+        }
+        else {
+            throw std::runtime_error("Expected ';'");
+        }
+    }
+    else {
+        throw std::runtime_error("Expected '='");
+    }
+}
+
+void Parser::ifStmt(){
+    if (currToken == Token::LPAREN){
+        currToken = lexer.nextToken();
+        expression();
+        if (currToken == Token::RPAREN){
+            currToken = lexer.nextToken();
+            statement();
+            if (currToken == Token::KW_ELSE){
+                currToken = lexer.nextToken();
+                statement();
+            }
+        }
+        else {
+            throw std::runtime_error("Expected ')'");
+        }
+    }
+    else {
+        throw std::runtime_error("Expected '('");
+    }
+}
+
+void Parser::whileStmt(){
+    if (currToken == Token::LPAREN) {
+        currToken = lexer.nextToken();
+        expression();
+        if (currToken == Token::RPAREN) {
+            statement();
+        }
+        else {
+            throw std::runtime_error("Expected ')'");
+        }
+    }
+    else {
+        throw std::runtime_error("Expected '('");
+    }
+}
+
+void Parser::printStmt(){
+    if (currToken == Token::LPAREN) {
+        currToken = lexer.nextToken();
+        expression();
+        if (currToken == Token::RPAREN) {
+            if (currToken == Token::SEMICOLON){
+                currToken = lexer.nextToken();
+            }
+            else {
+                throw std::runtime_error("Expected ';'");
+            }
+        }
+        else {
+            throw std::runtime_error("Expected ')'");
+        }
+    }
+    else {
+        throw std::runtime_error("Expected '('");
+    }
+}
+
+void Parser::block(){
+    while(currToken != Token::RBRACKET) {
+        if (currToken == Token::END_OF_FILE){
+            throw std::runtime_error("Expected '}'");
+        }
+        else {
+            currToken = lexer.nextToken();
+            statement();
+        }
+    }
+    currToken = lexer.nextToken();
 }
