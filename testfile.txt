@@ -1,6 +1,6 @@
 int x = 5;
 {
 int y = 10; // y es visible globalmente
-x <= x + y;
+x = x + y;
 }
 print(y); // Valido y todavia es accesible
