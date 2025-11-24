@@ -1,6 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include "lexer.h"
+#include "parser.h"
 
 int main (int argc, char *argv[]) {
     if (argc != 2) {
@@ -14,13 +14,8 @@ int main (int argc, char *argv[]) {
         return 1;
     }
 
-    Lexer lexer(in);
-
-    Token token = lexer.nextToken();
-    while (token != Token::END_OF_FILE) {
-        std::cout << "Token: " << lexer.tokenToString(token) << ", text = '" << lexer.getLexeme() << "'\n";
-        token = lexer.nextToken();
-    }
+    Parser parser(in);
+    parser.Parse();
 
     in.close();
 

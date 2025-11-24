@@ -43,6 +43,12 @@ void Parser::varDecl(){
         if (currToken == Token::OP_ASSIGN){
             currToken = lexer.nextToken();
             expression();
+            if (currToken == Token::SEMICOLON){
+                currToken = lexer.nextToken();
+            }
+            else {
+                throw std::runtime_error("Expected ';'");
+            }
         }
         else if (currToken == Token::SEMICOLON){
             currToken = lexer.nextToken();
@@ -98,6 +104,7 @@ void Parser::whileStmt(){
         currToken = lexer.nextToken();
         expression();
         if (currToken == Token::RPAREN) {
+            currToken = lexer.nextToken();
             statement();
         }
         else {
@@ -114,6 +121,7 @@ void Parser::printStmt(){
         currToken = lexer.nextToken();
         expression();
         if (currToken == Token::RPAREN) {
+            currToken = lexer.nextToken();
             if (currToken == Token::SEMICOLON){
                 currToken = lexer.nextToken();
             }
@@ -136,7 +144,6 @@ void Parser::block(){
             throw std::runtime_error("Expected '}'");
         }
         else {
-            currToken = lexer.nextToken();
             statement();
         }
     }
