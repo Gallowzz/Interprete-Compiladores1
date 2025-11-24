@@ -221,7 +221,7 @@ Token Lexer::nextToken() {
                     state = State::GEQ_Q1;
                 }
                 else
-                    return Token::OP_LESS;
+                    return Token::OP_GREAT;
                 break;
 
             case State::GEQ_Q1:

@@ -1,10 +1,12 @@
 #include "parser.h"
+#include <iostream>
 
 void Parser::Parse() {
     currToken = lexer.nextToken();
     while (currToken != Token::END_OF_FILE){
         statement();
     }
+    std::cout << "Codigo Compila.";
 }
 
 void Parser::statement(){
