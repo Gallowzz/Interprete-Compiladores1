@@ -142,3 +142,85 @@ void Parser::block(){
     }
     currToken = lexer.nextToken();
 }
+
+void Parser::expression(){
+    logicalOr();
+}
+
+void Parser::logicalOr(){
+    logicalAnd();
+    while (currToken == Token::OP_OR){
+        currToken = lexer.nextToken();
+        logicalAnd();
+    }
+}
+
+void Parser::logicalAnd(){
+    equality();
+    while (currToken == Token::OP_AND) {
+        currToken = lexer.nextToken();
+        equality();
+    }
+}
+
+void Parser::equality(){
+    comparison();
+    while (currToken == Token::OP_EQ || currToken == Token::OP_NEQ){
+        currToken = lexer.nextToken();
+        comparison();
+    }
+}
+
+void Parser::comparison(){
+    term();
+    while (currToken == Token::OP_LESS || currToken == Token::OP_GREAT
+        || currToken == Token::OP_LEQ || currToken == Token::OP_GEQ){
+        currToken = lexer.nextToken();
+        term();
+    }
+}
+
+void Parser::term(){
+    factor();
+    while (currToken == Token::OP_PLUS || currToken == Token::OP_MINUS){
+        currToken = lexer.nextToken();
+        factor();
+    }
+}
+
+void Parser::factor(){
+    unary();
+    while(currToken == Token::OP_MULT || currToken == Token::OP_DIV || currToken == Token::OP_MOD){
+        currToken = lexer.nextToken();
+        unary();
+    }
+}
+
+void Parser::unary(){
+    if (currToken == Token::OP_NOT || currToken == Token::OP_MINUS){
+        currToken = lexer.nextToken();
+        unary();
+    }
+    else {
+        primary();
+    }
+}
+
+void Parser::primary(){
+    if (currToken == Token::LPAREN){
+        currToken = lexer.nextToken();
+        expression();
+        if (currToken == Token::RPAREN){
+            currToken = lexer.nextToken();
+        }
+        else {
+            throw std::runtime_error("Expected ')'");
+        }
+    }
+    else if (currToken == Token::NUMBER || currToken == Token::IDENTIFIER){
+        currToken = lexer.nextToken();
+    }
+    else {
+        throw std::runtime_error("Expected number, identifier, or')'");
+    }
+}
