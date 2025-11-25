@@ -24,9 +24,12 @@ enum class State {
     NUM_Q1,         // Enteros 64-bits
     ID_Q1,          // Identificadores y Palabras Claves (minusculas)
     ID_Q2,          // Solo Identificadores
+    BR_ID_Q1,        // Bracket IDENTIFIER
     // Otros
     SPACES_Q1,      // Espacios
     COMMENT_Q1,     // Comentarios
+    COMMENT_Q2,     // Comentarios Multilinea (Estrella 1)
+    COMMENT_Q3,     // Comentarios Multilinea (Estrella 2)
     EOF_Q1,         // Final de Archivo
 };
 
@@ -53,6 +56,11 @@ Token Lexer::nextToken() {
                     lexeme += static_cast<char>(currChar);
                     currChar = in.get();
                     state = State::ID_Q2;
+                }
+                else if (currChar == '['){
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::BR_ID_Q1;
                 }
                 else if (currChar == '-'){
                     lexeme += static_cast<char>(currChar);
@@ -153,6 +161,16 @@ Token Lexer::nextToken() {
                 }
                 break;
 
+            case State::BR_ID_Q1:
+                if (currChar != ']' || currChar != '[' || currChar != '\n'){
+                    lexeme += static_cast<char>(currChar);
+                    currChar = in.get();
+                    state = State::BR_ID_Q1;
+                }
+                else {
+                    return Token::BRACKET_IDENT;
+                }
+
             case State::MINUS_Q1:
                 if (is_Digit(currChar)) {
                     lexeme += static_cast<char>(currChar);
@@ -167,6 +185,10 @@ Token Lexer::nextToken() {
                 if (currChar == '/') {
                     currChar = in.get();
                     state = State::COMMENT_Q1;
+                }
+                else if (currChar == '*'){
+                    currChar = in.get();
+                    state = State::COMMENT_Q2;
                 }
                 else
                     return Token::OP_DIV;
@@ -265,6 +287,26 @@ Token Lexer::nextToken() {
                     state = State::Q0;
                 }
                 break;
+
+            case State::COMMENT_Q2:
+                if (currChar == '*'){
+                    currChar = in.get();
+                    state = State::COMMENT_Q3;
+                }
+                else {
+                    currChar = in.get();
+                    state = State::COMMENT_Q2;
+                }
+
+            case State::COMMENT_Q3:
+                if (currChar == '/'){
+                    state = State::Q0;
+                }
+                else {
+                    currChar = in.get();
+                    state = State::COMMENT_Q2;
+                }
+                
 
             case State::SPACES_Q1:
                 if (currChar == ' ' || currChar == '\t') {
@@ -370,6 +412,7 @@ const char *Lexer::tokenToString(Token &token){
         case Token::END_OF_FILE: return "END_OF_FILE";
         case Token::NUMBER: return "NUMBER";
         case Token::IDENTIFIER: return "IDENTIFIER";
+        case Token::BRACKET_IDENT: return "BRACKET_IDENT";
         case Token::KW_INT: return "KW_INT";
         case Token::KW_IF: return "KW_IF";
         case Token::KW_ELSE: return "KW_ELSE";

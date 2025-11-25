@@ -5,6 +5,7 @@ enum class Token {
     END_OF_FILE,
     NUMBER,
     IDENTIFIER,
+    BRACKET_IDENT,
     // Keywords
     KW_INT,
     KW_IF,
@@ -35,10 +36,9 @@ enum class Token {
     COMA,
     LPAREN,
     RPAREN,
-    LBRACKET,
-    RBRACKET,
-    // Not a Token
-    N_A_T
+    LBRACKET, // {
+    RBRACKET, // }
+    N_A_T,        // // Not a Token
 };
 
 class Lexer {
@@ -53,9 +53,7 @@ public:
 
     Token nextToken();
     std::string getLexeme() const { return lexeme; }
-    static const char *Lexer::tokenToString(Token &token);
-
-    // Para identificar tokens pertenecientes a grupos amplios
+    static const char *Lexer::tokenToString(Token &token);    // Para identificar tokens pertenecientes a grupos amplios
     // e.g. Keywords, Operadores, o Delimitadores
     Token tokenize_keyword(std::string& lexeme);
     Token tokenize_arithmetic(std::string& lexeme);

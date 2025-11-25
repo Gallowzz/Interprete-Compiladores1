@@ -1,6 +1,10 @@
-int x = 5;
-{
-int y = 10; // y es visible globalmente
-x = x + y;
-}
-print(y); // Valido y todavia es accesible
+/* Este es un comentario
+de bloque que debe ser
+ignorado por el lexer */
+
+int x = 10;
+
+/* Comentario con un * asterisco adentro */
+
+print([variable con espacios]);
+print([mi-variable-custom]);
